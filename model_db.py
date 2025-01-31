@@ -1,4 +1,4 @@
-from extensions import db
+from app.setup_db import db
 
 """
 Здесь находятся все определения моделей
