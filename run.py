@@ -1,8 +1,9 @@
 from app.config import Config
-from model_db import db
-from namespaces.director_namespace import directors_ns
-from namespaces.movie_namespace import movies_ns
-from namespaces.genre_namespace import genres_ns
+from app.setup_db import db
+from app.views.directors import directors_ns
+from app.views.genres import genres_ns
+from app.views.movies import movies_ns
+
 from flask import Flask
 from flask_restx import Api
 
