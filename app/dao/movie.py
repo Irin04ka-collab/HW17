@@ -9,16 +9,8 @@ class MovieDAO:
         return self.session.query(Movie).get(mid)
 
     def get_all(self):
-        return self.session.query(Movie).all()
+        return self.session.query(Movie)
 
-    def get_movie_by_director(self, did):
-        pass
-
-    def get_movie_by_genre(self, gid):
-        pass
-
-    def get_movie_by_year(self, year):
-        pass
 
     def create(self, data):
         movie = Movie(**data)

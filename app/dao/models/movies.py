@@ -17,6 +17,7 @@ class Movie(db.Model):
     director_id = db.Column(db.Integer, db.ForeignKey("director.id"))
     director = db.relationship("Director")
 
+
 class MovieSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str()
@@ -24,8 +25,6 @@ class MovieSchema(Schema):
     trailer = fields.Str()
     year = fields.Int()
     rating = fields.Int()
-    genre_id = fields.Int()
     genre = fields.Nested(GenreSchema)
-    director_id = fields.Int()
     director = fields.Nested(DirectorSchema)
 

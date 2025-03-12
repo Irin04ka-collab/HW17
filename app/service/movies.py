@@ -1,3 +1,4 @@
+from app.dao.models.movies import Movie
 from app.dao.movie import MovieDAO
 
 
@@ -8,26 +9,36 @@ class MovieService:
     def get_one(self, mid):
         return self.dao.get_one(mid)
 
-    def get_all_by_filter(self, filter):
+    def get_all_by_filter(self, set_of_query):
 
-        all_movie = self.dao.get_all()
-        movies_by_filter = [ ]
+        # all_movie = self.dao.get_all()
+        query = self.dao.get_all()
 
-        for movie in all_movie:
+        if set_of_query.get('genre_id'):
+            query = query.filter(Movie.genre_id == set_of_query['genre_id'])
+        if set_of_query.get('year'):
+            query = query.filter(Movie.year == set_of_query['year'])
+        if set_of_query.get('director_id'):
+            query = query.filter(Movie.director_id == set_of_query['director_id'])
 
-            if filter.get('genre_id'):
-                if filter['genre_id'] == movie.genre_id:
-                    movies_by_filter.append(movie)
+        movies = query.all()
+        # movies_by_filter = [ ]
 
-            if filter.get('year'):
-                if filter['year'] == movie.year:
-                    movies_by_filter.append(movie)
+        # for movie in all_movie:
+        #
+        #     if filter.get('genre_id'):
+        #         if filter['genre_id'] == movie.genre_id:
+        #             movies_by_filter.append(movie)
+        #
+        #     if filter.get('year'):
+        #         if filter['year'] == movie.year:
+        #             movies_by_filter.append(movie)
+        #
+        #     if filter.get('director_id'):
+        #         if filter['director_id'] == movie.director_id:
+        #             movies_by_filter.append(movie)
 
-            if filter.get('director_id'):
-                if filter['director_id'] == movie.director_id:
-                    movies_by_filter.append(movie)
-
-        return movies_by_filter
+        return movies
 
 
     def get_all(self):
