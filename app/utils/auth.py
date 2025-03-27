@@ -2,10 +2,10 @@ import jwt
 import os
 from flask import request, abort
 from functools import wraps
-from dotenv import load_dotenv
-
-# Загружаем переменные окружения
-load_dotenv()
+# from dotenv import load_dotenv
+#
+# # Загружаем переменные окружения
+# load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "default_secret")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")

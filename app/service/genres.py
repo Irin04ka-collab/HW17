@@ -21,7 +21,7 @@ class GenreService:
         for key, value in data.items():
             setattr(genre, key, value)
 
-        self.dao.update(genre)
+        return self.dao.update(genre)
 
     def update_partial(self, data):
         gid = data.get("id")
@@ -30,7 +30,7 @@ class GenreService:
         if "name" in data:
             genre.name = data.get("name")
 
-        self.dao.update(genre)
+        return self.dao.update(genre)
 
     def delete(self, gid):
         self.dao.delete(gid)

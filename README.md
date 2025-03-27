@@ -16,3 +16,4 @@ This project is a REST API for managing movies, genres, directors, and users. It
 - SQLAlchemy  
 - JWT (JSON Web Token)  
 - Swagger (API documentation) 
+- 

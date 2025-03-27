@@ -27,10 +27,6 @@ class AuthService:
 
     def check_user(self, username, password, is_refresh=False):
         user = self.user_service.get_by_username(username)
-
-        if None in [username, password]:
-            abort(400, "Username or password is None")
-
         if user is None:
             abort(401, "Invalid username or password")
 

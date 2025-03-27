@@ -54,7 +54,7 @@ class MovieService:
         for key, value in data.items():
             setattr(movie, key, value)
 
-        self.dao.update(movie)
+        return self.dao.update(movie)
 
     def update_partial(self, data):
         mid = data.get("id")
@@ -75,7 +75,7 @@ class MovieService:
         if "director_id" in data:
             movie.director_id = data.get("director_id")
 
-        self.dao.update(movie)
+        return self.dao.update(movie)
 
     def delete(self, mid):
         self.dao.delete(mid)

@@ -67,7 +67,8 @@ class MovieView(Resource):
         # Return HTTP 204 No Content status
         return "", 204
 
-    @admin_required
+
+
     def patch(self, mid: int):
         req_json = request.json
         req_json["id"] = mid

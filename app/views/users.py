@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, abort
 
 from app.container import user_service
-from app.dao.models.users import UserSchema
+from app.dao.models.users import UserSchema, User
 from app.utils.auth import admin_required
 from app.utils.auth import auth_required
 
@@ -21,6 +21,7 @@ class UsersView(Resource):
 
     def post(self):
         req_json = request.json
+
         user_name = req_json.get("username", None)
         user_password = req_json.get("password", None)
         user_role = req_json.get("role", None)

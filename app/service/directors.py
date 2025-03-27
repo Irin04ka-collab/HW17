@@ -21,7 +21,7 @@ class DirectorService:
         for key, value in data.items():
             setattr(director, key, value)
 
-        self.dao.update(director)
+        return self.dao.update(director)
 
     def update_partial(self, data):
         did = data.get("id")
@@ -30,7 +30,7 @@ class DirectorService:
         if "name" in data:
             director.name = data.get("name")
 
-        self.dao.update(director)
+        return self.dao.update(director)
 
     def delete(self, did):
         self.dao.delete(did)
