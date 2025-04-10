@@ -1,9 +1,10 @@
-# create_data.py
+
 from flask import Flask
+from app.dao.models.directors import Director
+from app.dao.models.genres import Genre
+from app.setup_db import db
+from app.dao.models.movies import Movie
 
-# чтобы создать БД с данными 
-
-from model_db import db, Movie, Director, Genre
 
 def init_db(app):
     """
@@ -14,6 +15,7 @@ def init_db(app):
         db.drop_all()
         db.create_all()
         fill_out_db()
+        db.session.commit()
 
 # -------------------------------------------------------
 def fill_out_db():

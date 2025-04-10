@@ -1,9 +1,11 @@
 from app.dao.director import DirectorDAO
+from app.dao.favorite import FavoriteDAO
 from app.dao.genre import GenreDAO
 from app.dao.movie import MovieDAO
 from app.dao.user import UserDAO
 from app.service.auth import AuthService
 from app.service.directors import DirectorService
+from app.service.favorites import FavoriteService
 from app.service.genres import GenreService
 from app.service.movies import MovieService
 from app.service.users import UserService
@@ -23,3 +25,6 @@ user_dao = UserDAO(db.session)
 user_service = UserService(user_dao)
 
 auth_service = AuthService(user_service)
+
+favorite_dao = FavoriteDAO(db.session)
+favorite_service = FavoriteService(favorite_dao)

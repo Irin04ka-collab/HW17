@@ -37,7 +37,7 @@ class GenreView(Resource):
     def put(self, gid: int):
         req_json = request.json
         req_json["id"] = gid
-        genre_service.update_partial(req_json)
+        genre_service.update_data_partial(req_json)
 
         return "", 204
 

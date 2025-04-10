@@ -1,14 +1,14 @@
-from flask import request
+from flask import request, jsonify
 from flask_restx import Namespace, Resource
 
 from app.container import movie_service
-from app.dao.models.movies import MovieSchema
+from app.dao.models.movies import movie_schema
+from app.dao.models.movies import movies_schema
 from app.utils.auth import auth_required, admin_required
+from app.utils.movies import paginate_query
 
 movies_ns = Namespace('movies')
 
-movie_schema = MovieSchema()
-movies_schema = MovieSchema(many=True)
 
 @movies_ns.route('')
 class MoviesView(Resource):
@@ -18,21 +18,25 @@ class MoviesView(Resource):
         filters = {
             "genre_id": request.args.get("genre_id"),
             "year": request.args.get("year"),
-            "director_id": request.args.get("director_id")
+            "director_id": request.args.get("director_id"),
+            "status": request.args.get("status")
         }
 
         # Filter out empty values from the dictionary and convert them to integers
         # This ensures that only valid filters will be passed to the database query
-        filters = {k: int(v) for k, v in filters.items() if v is not None}
+        filters = {k: v for k, v in filters.items() if v is not None}
 
         # If no filters were provided, return all movies
-        if not filter:
+        if not filters:
             all_movies = movie_service.get_all()
-            return movies_schema.dump(all_movies), 200
+            response = paginate_query(all_movies)
+            return response, 200
+
 
         # Otherwise, apply filters to the query
-        movies_by_filter = movie_service.get_all_by_filter(filters)
-        return movies_schema.dump(movies_by_filter), 200
+        movies_by_filter = movie_service.get_query_by_filter(filters)
+        response = paginate_query(movies_by_filter)
+        return response, 200
 
     @admin_required
     def post(self):
@@ -75,7 +79,7 @@ class MovieView(Resource):
 
         # Partially update the movie with the provided data
         # This method allows updating only specific fields
-        movie_service.update_partial(req_json)
+        movie_service.update_data_partial(req_json)
 
         # Return HTTP 204 No Content status
         return "", 204

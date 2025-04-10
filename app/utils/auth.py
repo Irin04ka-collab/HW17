@@ -2,6 +2,9 @@ import jwt
 import os
 from flask import request, abort
 from functools import wraps
+
+from app.container import user_service
+
 # from dotenv import load_dotenv
 #
 # # Загружаем переменные окружения
@@ -21,8 +24,11 @@ def get_user_from_token():
     token = auth_header.split("Bearer ")[-1].strip()
 
     try:
-        user = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return user  # Возвращает декодированные данные пользователя
+        user_by_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = user_by_token.get("email")
+
+        user = user_service.get_by_username(email)
+        return user  # Возвращает объект user
     except jwt.ExpiredSignatureError:
         abort(401, "Token has expired")
     except jwt.InvalidTokenError:
@@ -42,8 +48,13 @@ def admin_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         user = get_user_from_token()  # Получаем пользователя
-        if user.get("role") != "admin":
+        if user.role != "admin":
             abort(403, "Admin role required")
         return func(*args, **kwargs)
 
     return wrapper
+
+from email.utils import parseaddr
+
+def is_valid_email(email):
+    return '@' in parseaddr(email)[1]

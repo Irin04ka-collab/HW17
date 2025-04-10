@@ -7,7 +7,9 @@ from app.dao.genre import GenreDAO
 from app.dao.models.directors import Director
 from app.dao.models.genres import Genre
 from app.dao.models.movies import Movie
+from app.dao.models.users import User
 from app.dao.movie import MovieDAO
+from app.dao.user import UserDAO
 
 
 @pytest.fixture()
@@ -80,6 +82,20 @@ def movie_dao():
     return movie_dao
 
 
+@pytest.fixture()
+def user_dao(self):
+    dao = UserDAO(None)
+
+    user_1 = User(id=1, email="email1@gmail.com", name="Name1")
+    user_2 = User(id=2, email="email2@gmail.com", name="Name2")
+
+    dao.get_one = MagicMock(return_value=user_1)
+    dao.get_all = MagicMock(return_value=[user_1, user_2])
+    dao.create = MagicMock(return_value=User(id=3, email="email3@gmail.com", name="Name3"))
+    dao.get_by_username = MagicMock(return_value=user_1)
+    dao.update = MagicMock(return_value=User(id=1, email="email1@gmail.com", name="Name1_updated"))
+    dao.delete = MagicMock(return_value=None)
+    return dao
 
 
 

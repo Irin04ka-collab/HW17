@@ -16,17 +16,30 @@ class UserService:
     def get_all(self):
         return self.dao.get_all()
 
-    def get_by_username(self, username):
-        return self.dao.get_by_username(username)
+    def get_by_username(self, email):
+        return self.dao.get_by_username(email)
 
     def create(self, user_d):
         user_d["password"] = self.make_user_password_hash(user_d.get("password"))
         return self.dao.create(user_d)
 
-    def update(self, user_d):
-        user_d["password"] = self.make_user_password_hash(user_d.get("password"))
-        self.dao.update(user_d)
-        return self.dao
+    def update_password(self, user_id, new_password):
+        user = self.get_one(user_id)
+        user.password = self.make_user_password_hash(new_password)
+        self.dao.session.commit()
+        return user
+
+    def update_data_partial(self, data, uid):
+        user = self.get_one(uid)
+
+        if "name" in data:
+            user.name = data.get("name")
+        if "surname" in data:
+            user.surname = data.get("surname")
+        if "favorite_genre" in data:
+            user.favorite_genre = data.get("favorite_genre")
+        self.dao.session.commit()
+        return user
 
     def delete(self, rid):
         self.dao.delete(rid)
