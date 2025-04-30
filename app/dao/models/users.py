@@ -1,6 +1,4 @@
 from marshmallow import Schema, fields
-
-from app.dao.models.genres import GenreSchema
 from app.setup_db import db
 
 
@@ -23,4 +21,4 @@ class UserSchema(Schema):
     role = fields.Str()
     name = fields.Str()
     surname = fields.Str()
-    favorite_genre = fields.Pluck("GenreSchema", "name")
+    favorite_genre_name = fields.Function(lambda obj: obj.genre.name if obj.genre else None)

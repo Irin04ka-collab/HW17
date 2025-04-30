@@ -1,5 +1,5 @@
-from app.dao.models.directors import DirectorSchema
-from app.dao.models.genres import GenreSchema
+from datetime import date
+
 from app.setup_db import db
 from marshmallow import Schema, fields, types, ValidationError
 
@@ -16,6 +16,7 @@ class Movie(db.Model):
     genre = db.relationship("Genre")
     director_id = db.Column(db.Integer, db.ForeignKey("director.id"))
     director = db.relationship("Director")
+    data_added = db.Column(db.Date, nullable=False, default=date.today, onupdate=None)
 
 
 class MovieSchema(Schema):
@@ -25,8 +26,11 @@ class MovieSchema(Schema):
     trailer = fields.Str()
     year = fields.Int()
     rating = fields.Int()
+    genre_id = fields.Int()
+    director_id = fields.Int()
     genre = fields.Pluck("GenreSchema", "name")
     director = fields.Pluck("DirectorSchema", "name")
+    # data_added = fields.Date()
 
 movie_schema = MovieSchema()
 movies_schema = MovieSchema(many=True)

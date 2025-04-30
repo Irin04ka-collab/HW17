@@ -1,19 +1,23 @@
 from flask import request
 from flask_restx import Namespace, Resource, abort
 
+from app.api_models import favorite_fields
 from app.container import favorite_service, movie_service
 from app.dao.models.favorites import Favorite, FavoriteSchema
 from app.utils.auth import auth_required, get_user_from_token
 
 favorites_ns = Namespace('favorites')
-favorite_ns = Namespace('favorite')
 
 favorite_schema = FavoriteSchema()
 favorites_schema = FavoriteSchema(many=True)
 
-@favorites_ns.route('')
+# Добавляем модель в Swagger
+favorite_model = favorites_ns.model('Favorite', favorite_fields)
+
+@favorites_ns.route('/movies')
 class FavoritesView(Resource):
     @auth_required
+    @favorites_ns.marshal_with(favorite_model)
     def get(self):
         user = get_user_from_token()  #получаем данные по пользователю из токена
         if not user:
@@ -23,7 +27,7 @@ class FavoritesView(Resource):
 
         return favorites_schema.dump(movies_by_user), 200
 
-@favorites_ns.route('movies/<int:mid>')
+@favorites_ns.route('/movies/<int:mid>')
 class FavoritesMovieView(Resource):
     @auth_required
     def post(self, mid: int):
@@ -42,6 +46,7 @@ class FavoritesMovieView(Resource):
 
         return {"message": f"Movie {movie.title} added to favorite movies for {user.name}"}, 201
 
+    @auth_required
     def delete(self, mid: int):
         user = get_user_from_token()  # получаем данные по пользователю из токена
         if not user:

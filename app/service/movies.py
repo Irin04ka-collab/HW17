@@ -21,7 +21,7 @@ class MovieService:
         if set_of_query.get('director_id'):
             query = query.filter(Movie.director_id == set_of_query['director_id'])
         if set_of_query.get('status') == "new":
-            query = query.order_by(Movie.year)
+            query = query.order_by(Movie.data_added.desc())
 
         # movies = query.all()
 

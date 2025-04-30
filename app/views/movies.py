@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource
 
+from app.api_models import movie_fields
 from app.container import movie_service
 from app.dao.models.movies import movie_schema
 from app.dao.models.movies import movies_schema
@@ -9,9 +10,13 @@ from app.utils.movies import paginate_query
 
 movies_ns = Namespace('movies')
 
+# Добавляем модель в Swagger
+movie_model = movies_ns.model('Movie', movie_fields)
+
 
 @movies_ns.route('')
 class MoviesView(Resource):
+    @movies_ns.marshal_with(movie_model, as_list=True)
     @auth_required
     def get(self):
 
@@ -38,7 +43,7 @@ class MoviesView(Resource):
         response = paginate_query(movies_by_filter)
         return response, 200
 
-    @admin_required
+    # @admin_required
     def post(self):
         req_json = request.json
 
@@ -52,6 +57,7 @@ class MoviesView(Resource):
 @movies_ns.route('/<int:mid>')
 class MovieView(Resource):
     @auth_required
+    @movies_ns.marshal_with(movie_model)
     def get(self, mid: int):
         # Retrieve a single movie from the database by its ID
         movie = movie_service.get_one(mid)

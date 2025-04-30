@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource, abort
 
+from app.api_models import user_input_fields, change_password_fields, user_output_fields, users_fields
 from app.container import user_service
 from app.dao.models.users import UserSchema, User
 from app.utils.auth import admin_required, get_user_from_token
@@ -12,9 +13,18 @@ user_ns = Namespace('user')
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
+# Добавляем модель в Swagger
+user_input_model = user_ns.model('User model for update', user_input_fields)
+user_output_model = user_ns.model('User model for output', user_output_fields)
+users_model = user_ns.model('Users model', users_fields)
+
+change_password_model = user_ns.model('ChangePassword', change_password_fields)
+
+
 @user_ns.route('')
 class UserView(Resource):
     @auth_required
+    @user_ns.marshal_with(user_output_model)
     def get(self):
         user = get_user_from_token()  #получаем данные по пользователю из токена
         if not user:
@@ -27,6 +37,7 @@ class UserView(Resource):
             "favorite_genre":user.favorite_genre
         }
 
+    @user_ns.expect(user_input_model)
     def patch(self):
         user = get_user_from_token()  #получаем данные по пользователю из токена
         user_id = user.id
@@ -41,17 +52,19 @@ class UserView(Resource):
 @user_ns.route('/password')
 class UserPasswordView(Resource):
     @auth_required
+    @user_ns.expect(change_password_model)
     def put(self):
         user = get_user_from_token()  # получаем данные по пользователю из токена
         req_json = request.json
 
-        password_1 = req_json.get("password_1")
-        password_2 = req_json.get("password_2")
+        password_1 = req_json.get("password")
+        password_2 = req_json.get("confirmed_password")
 
         if not password_1 or not password_2:
-            abort(400, "Both password_1 and password_2 are required")
+            abort(400, "Both password and confirmed_password are required")
 
-        if password_1 != password_2:
+        if (password_1
+                != password_2):
             abort(400, "Passwords do not match")
 
         if user_service.compare_passwords(user.password,password_1):
@@ -63,11 +76,13 @@ class UserPasswordView(Resource):
 @users_ns.route('')
 class UsersView(Resource):
     @auth_required
+    @users_ns.marshal_with(users_model)
     def get(self):
         all_users = user_service.get_all()
         users = users_schema.dump(all_users)
         return users, 200
 
+    @admin_required
     def post(self):
         req_json = request.json
 

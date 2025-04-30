@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource
 
+from app.api_models import genre_fields
 from app.container import genre_service
 from app.dao.models.genres import GenreSchema
 from app.utils.auth import auth_required, admin_required
@@ -10,10 +11,14 @@ genres_ns = Namespace('genres')
 genre_schema = GenreSchema()
 genres_schema = GenreSchema(many=True)
 
+# Добавляем модель в Swagger
+genre_model = genres_ns.model('Genre', genre_fields)
+
 
 @genres_ns.route('')
 class GenresView(Resource):
     @auth_required
+    @genres_ns.marshal_with(genre_model, as_list=True)
     def get(self):
         all_genres = genre_service.get_all()
         return genres_schema.dump(all_genres), 200
@@ -29,6 +34,7 @@ class GenresView(Resource):
 @genres_ns.route('/<gid>')
 class GenreView(Resource):
     @auth_required
+    @genres_ns.marshal_with(genre_model)
     def get(self, gid: int):
         genre = genre_service.get_one(gid)
         return genre_schema.dump(genre), 200

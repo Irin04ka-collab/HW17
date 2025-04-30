@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Namespace, Resource
-
+from app.api_models import director_fields
 from app.container import director_service
 from app.dao.models.directors import DirectorSchema
 from app.utils.auth import auth_required, admin_required
@@ -10,9 +10,14 @@ directors_ns = Namespace('directors')
 director_schema = DirectorSchema()
 directors_schema = DirectorSchema(many=True)
 
+# Добавляем модель в Swagger
+director_model = directors_ns.model('Director', director_fields)
+
+
 @directors_ns.route('')
 class DirectorsView(Resource):
     @auth_required
+    @directors_ns.marshal_with(director_model, as_list=True)
     def get(self):
         all_directors = director_service.get_all()
         return directors_schema.dump(all_directors), 200
@@ -27,6 +32,7 @@ class DirectorsView(Resource):
 @directors_ns.route('/<did>')
 class DirectorView(Resource):
     @auth_required
+    @directors_ns.marshal_with(director_model)
     def get(self, did: int):
         director = director_service.get_one(did)
         return director_schema.dump(director), 200

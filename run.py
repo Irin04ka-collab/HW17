@@ -1,29 +1,31 @@
-from flask import Flask, render_template
-from flask_restx import Api
+from flask import Flask, render_template, redirect
+from flask_migrate import Migrate
+
+from flask_restx import Api, apidoc
 from app.config import Config
-from app.create_data import init_db
 from app.setup_db import db
+
+from app.views import directors_ns, favorites_ns, genres_ns, movies_ns
+
 from app.views.auth import auth_ns
-from app.views.directors import directors_ns
-from app.views.favorites import favorites_ns
-from app.views.genres import genres_ns
-from app.views.movies import movies_ns
 from app.views.users import users_ns, user_ns
 
 
 def create_app(config: Config) -> Flask:
 
     application = Flask(__name__)
+    application.url_map.strict_slashes = False
     application.config.from_object(config)
 
-    # @application.route('/')
-    # def index():
-    #     return render_template('index.html')
+    @application.route('/')
+    def index():
+        return redirect('/docs')
 
     return application
 
 
 def configure_app(application: Flask):
+    migrate = Migrate(application, db)
     db.init_app(application)
 
     api = Api(
@@ -38,8 +40,10 @@ def configure_app(application: Flask):
                 'name': 'Authorization'
             }
         },
-        security='Bearer'
+        security='Bearer',
+        doc="/docs",
     )
+
 
     api.add_namespace(directors_ns, path='/directors')
     api.add_namespace(movies_ns, path='/movies')
@@ -53,7 +57,9 @@ def configure_app(application: Flask):
 if __name__ == '__main__':
     app_config = Config()
     app = create_app(app_config)
+
     configure_app(app)
+
     with app.app_context():
         # init_db(app)
         db.create_all()

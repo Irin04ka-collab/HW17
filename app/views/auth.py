@@ -1,13 +1,17 @@
 from flask import request
 from flask_restx import Namespace, Resource, abort
 
+from app.api_models import auth_fields
 from app.container import auth_service, user_service
 from app.utils.auth import is_valid_email
 
 auth_ns = Namespace('auth')
 
+auth_model = auth_ns.model('Auth', auth_fields)
+
 @auth_ns.route('/register')
 class AuthRegView(Resource):
+    @auth_ns.expect(auth_model)
     def post(self):
         data = request.json
 
@@ -32,6 +36,7 @@ class AuthRegView(Resource):
 
 @auth_ns.route('/login')
 class AuthView(Resource):
+    @auth_ns.expect(auth_model)
     def post(self):
         data = request.json
 
